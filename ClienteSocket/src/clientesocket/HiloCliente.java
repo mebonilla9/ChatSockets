@@ -6,9 +6,9 @@
 package clientesocket;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.regex.Pattern;
 import javax.swing.JTextArea;
 
 /**
@@ -17,29 +17,33 @@ import javax.swing.JTextArea;
  */
 public class HiloCliente extends Thread {
 
-    private final JTextArea txtConversacion;
-    private final Socket conexion;
-    private static boolean continuar = true;
+  private final JTextArea txtConversacion;
+  private final Socket conexion;
+  private final RsaUtil rsaUtil;
+  private static boolean continuar = true;
 
-    public HiloCliente(JTextArea txtConversacion, Socket conexion) {
-        this.txtConversacion = txtConversacion;
-        this.conexion = conexion;
-    }
+  public HiloCliente(JTextArea txtConversacion, Socket conexion, RsaUtil rsaUtil) {
+    this.txtConversacion = txtConversacion;
+    this.conexion = conexion;
+    this.rsaUtil = rsaUtil;
+  }
 
-    @Override
-    public void run() {
-        try {
-            BufferedReader lector = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
-            while (continuar) {
-                String linea = lector.readLine();
-                if (linea != null || linea.endsWith("null")) {
-                    txtConversacion.append(linea + "\n");
-                }
-            }
-            lector.close();
-        } catch (IOException e) {
-            e.printStackTrace(System.err);
+  @Override
+  public void run() {
+    try {
+      BufferedReader lector = new BufferedReader(new InputStreamReader(conexion.getInputStream()));
+      while (continuar) {
+        String linea = lector.readLine();
+        if (linea != null || linea.endsWith("null")) {
+          String[] message = linea.split(Pattern.quote(": "));
+          String decryptMessage = rsaUtil.decrypt(message[1]);
+          txtConversacion.append(message[0] + ": " + decryptMessage + "\n");
         }
+      }
+      lector.close();
+    } catch (Exception e) {
+      e.printStackTrace(System.err);
     }
+  }
 
 }

@@ -5,8 +5,10 @@
  */
 package clientesocket;
 
+import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.security.NoSuchAlgorithmException;
 
 /**
  *
@@ -102,8 +104,8 @@ public class Inicio extends javax.swing.JFrame {
             out.flush();
             new Conversacion(conexion, txtUsuario.getText()).setVisible(true);
             dispose();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | NumberFormatException | NoSuchAlgorithmException e) {
+            e.printStackTrace(System.err);
         }
 
     }//GEN-LAST:event_btnIniciarActionPerformed
@@ -136,10 +138,8 @@ public class Inicio extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Inicio().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+          new Inicio().setVisible(true);
         });
     }
 

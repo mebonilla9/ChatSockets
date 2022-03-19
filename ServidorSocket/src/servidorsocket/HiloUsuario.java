@@ -16,29 +16,31 @@ import java.io.PrintStream;
  */
 public class HiloUsuario extends Thread {
 
-    private final Usuario objUsuario;
+  private final Usuario objUsuario;
 
-    public HiloUsuario(Usuario objUsuario) {
-        this.objUsuario = objUsuario;
-    }
+  public HiloUsuario(Usuario objUsuario) {
+    this.objUsuario = objUsuario;
+  }
 
-    @Override
-    public void run() {
-        try {
-            BufferedReader lector = new BufferedReader(new InputStreamReader(objUsuario.getConexion().getInputStream()));
-            while (Servicio.continuar) {
-                String linea = lector.readLine();
-                if (linea == null) {
-                    Servicio.continuar = false;
-                }
-                for (Usuario usuario : Servicio.LISTA_CLIENTES) {
-                    PrintStream out = new PrintStream(usuario.getConexion().getOutputStream());
-                    out.println(objUsuario.getNombre() + ": " + linea);
-                    out.flush();
-                }
-            }
-        } catch (IOException ex) {
-            ex.printStackTrace(System.err);
+  @Override
+  public void run() {
+    try {
+      BufferedReader lector = new BufferedReader(new InputStreamReader(objUsuario.getConexion().getInputStream()));
+      while (Servicio.continuar) {
+        String linea = lector.readLine();
+        if (linea == null) {
+          Servicio.continuar = false;
         }
+        for (Usuario usuario : Servicio.LISTA_CLIENTES) {
+          PrintStream out = new PrintStream(usuario.getConexion().getOutputStream());
+          String mensaje = objUsuario.getNombre() + ": " + linea;
+          System.out.println(mensaje);
+          out.println(mensaje);
+          out.flush();
+        }
+      }
+    } catch (IOException ex) {
+      ex.printStackTrace(System.err);
     }
+  }
 }
